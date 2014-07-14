@@ -1,0 +1,11 @@
+Experiment: trying to implement a generic fast DCT II/III based on "Fast and
+numerically stable algorithms for discrete cosine transforms" from Gerlind
+Plonkaa & Manfred Tasche (DOI: 10.1016/j.laa.2004.07.015).
+
+Current status: working with `python dct.py 1` and `python dct.py 2`. Starting
+`python dct.py 3`, permutations are wrong.
+
+TODO: make it work for n ≥ 3
+TODO: implement DCT-III (currently only attempting DCT-II)
+TODO: implement the non recursive form
+TODO: generate C code for a given size
