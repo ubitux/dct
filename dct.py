@@ -53,9 +53,11 @@ def An1(n):
     return numpy.dot(op1, op2)
 
 def permute(v):
-    out = numpy.hstack((v[::2], v[1::2]))
-    #print 'permute(%s) -> %s' % (v, out)
-    return out
+    n = len(v)
+    while n > 2:
+        v = numpy.hstack((v[::2], v[1::2]))
+        n /= 2
+    return v
 
 def cosII(x):
     n = len(x)
