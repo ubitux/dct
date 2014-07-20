@@ -14,7 +14,7 @@ np.set_printoptions(precision=3, linewidth=999)
 # a b
 # c d
 quad = lambda a_b, c_d: np.vstack((np.hstack(a_b),
-                                      np.hstack(c_d)))
+                                   np.hstack(c_d)))
 
 In = lambda n: np.identity(n, dtype=int)
 Jn = lambda n: np.fliplr(In(n))
@@ -65,7 +65,7 @@ def cosII(x):
     #print 'cosII n=%d' % n
     if n == 2:
         return np.dot(np.array([[1,  1],
-                                      [1, -1]]), x)
+                                [1, -1]]), x)
     if n >= 4:
         u = np.dot(Tn0_no_scale(n), x)
         v1 = cosII(u[:n/2])
