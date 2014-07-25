@@ -16,18 +16,18 @@ np.set_printoptions(precision=3, linewidth=999)
 quad = lambda a_b, c_d: np.vstack((np.hstack(a_b),
                                    np.hstack(c_d)))
 
-In = lambda n: np.identity(n, dtype=int)
-Jn = lambda n: np.fliplr(In(n))
+I = lambda n: np.identity(n, dtype=int)
+J = lambda n: np.fliplr(I(n))
 
-Tn0_no_scale = lambda n: quad((In(n / 2),  Jn(n / 2)),
-                              (In(n / 2), -Jn(n / 2)))
+T_0_no_scale = lambda n: quad((I(n / 2),  J(n / 2)),
+                              (I(n / 2), -J(n / 2)))
 
 diag = lambda a, b: quad((a, np.zeros((a.shape[0], b.shape[1]))),
                          (np.zeros((b.shape[0], a.shape[1])), b))
 
-def Tn1(n):
-    i_n1 = In(n / 2)
-    j_n1 = Jn(n / 2)
+def T_1(n):
+    i_n1 = I(n / 2)
+    j_n1 = J(n / 2)
     cos_vec = [cos((2*k+1)*pi/(4*n)) for k in range(n/2)]
     sin_vec = [sin((2*k+1)*pi/(4*n)) for k in range(n/2)][::-1]
     rev_cos_sign_vec = [(-x if i & 1 else x) for i, x in enumerate(cos_vec[::-1])]
@@ -39,18 +39,18 @@ def Tn1(n):
     return quad((m00, m01),
                 (m10, m11))
 
-def Dn(n):
+def D(n):
     m = np.zeros((n, n), dtype=int)
     for i in range(n):
         m[i, i] = -1 if i & 1 else 1
     return m
 
-def An1(n):
-    isq2_n1m1 = In(n/2-1) * 1./sqrt(2)
+def A_1(n):
+    isq2_n1m1 = I(n/2-1) * 1./sqrt(2)
     m = quad((isq2_n1m1,  isq2_n1m1),
              (isq2_n1m1, -isq2_n1m1))
     op1 = diag(diag(np.array([[1]]), m), np.array([[-1]]))
-    op2 = diag(In(n / 2), np.dot(Dn(n / 2), Jn(n / 2)))
+    op2 = diag(I(n / 2), np.dot(D(n / 2), J(n / 2)))
     return np.dot(op1, op2)
 
 def permute(v):
@@ -67,7 +67,7 @@ def cosII(x):
         return np.dot(np.array([[1,  1],
                                 [1, -1]]), x)
     if n >= 4:
-        u = np.dot(Tn0_no_scale(n), x)
+        u = np.dot(T_0_no_scale(n), x)
         v1 = cosII(u[:n/2])
         v2 = cosIV(u[n/2:])
         w = np.hstack((v1, v2))
@@ -78,28 +78,28 @@ def cosIV(x):
     n = len(x)
     #print 'cosIV n=%d' % n
     if n == 2:
-        return sqrt(2) * np.dot(CnIV(2), x)
+        return sqrt(2) * np.dot(C_IV(2), x)
     if n >= 4:
-        u = np.dot(sqrt(2) * Tn1(n), x)
+        u = np.dot(sqrt(2) * T_1(n), x)
         v1 = cosII(u[:n/2])
         v2 = cosII(u[n/2:])
-        w = np.dot(An1(n), np.hstack((v1, v2)))
+        w = np.dot(A_1(n), np.hstack((v1, v2)))
         return permute(w)
     assert False
 
-def Cn(f, n):
+def C(f, n):
     m = []
     for j in range(n):
         m.append([f(j, k) for k in range(n)])
     return np.array(m)
 
-def CnII(n):
+def C_II(n):
     f = lambda j, k: sqrt(2./n) * (1./sqrt(2) if j == 0 else 1) * cos(j*(2*k+1)*pi/(2*n))
-    return Cn(f, n)
+    return C(f, n)
 
-def CnIV(n):
+def C_IV(n):
     f = lambda j, k: sqrt(2./n) * cos((2*j+1)*(2*k+1)*pi/(4*n))
-    return Cn(f, n)
+    return C(f, n)
 
 t = int(sys.argv[1])
 n = 1<<t
@@ -108,8 +108,8 @@ print '# t=%d -> n=%d' % (t, n)
 samples = random.sample(range(0x100), n)
 
 tests = [
-    ('cos II', cosII, CnII),
-    ('cos IV', cosIV, CnIV),
+    ('cos II', cosII, C_II),
+    ('cos IV', cosIV, C_IV),
 ]
 
 for name, func, ref in tests:
