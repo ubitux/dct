@@ -160,7 +160,7 @@ st = lambda n, n1m1: [sin(k*pi/(2*n)) for k in range(1, n1m1+1)]
 
 def cosII(x, indent=0):
     n = len(x)
-    print (' '*indent*4) + 'cosII n=%d (x=%s)' % (n, x)
+    #print (' '*indent*4) + 'cosII n=%d (x=%s)' % (n, x)
     n1 = n / 2
     if n == 2:
         return np.dot(np.array([[1,  1],
@@ -174,7 +174,7 @@ def cosII(x, indent=0):
 
 def cosIV(x, indent=0):
     n = len(x)
-    print (' '*indent*4) + 'cosIV n=%d (x=%s)' % (n, x)
+    #print (' '*indent*4) + 'cosIV n=%d (x=%s)' % (n, x)
     n1 = n / 2
     if n == 2:
         return sqrt(2) * np.dot(C_IV(2), x)
@@ -188,7 +188,7 @@ def cosIV(x, indent=0):
 
 def cosI(x, indent=0):
     np1 = len(x)
-    print (' '*indent*4) + 'cosI n+1=%d (x=%s)' % (np1, x)
+    #print (' '*indent*4) + 'cosI n+1=%d (x=%s)' % (np1, x)
     n = np1 - 1
     n1 = n / 2
     if n == 2:
@@ -203,7 +203,7 @@ def cosI(x, indent=0):
 
 def cosIII(x, indent=0):
     n = len(x)
-    print (' '*indent*4) + 'cosIII n=%d (x=%s)' % (n, x)
+    #print (' '*indent*4) + 'cosIII n=%d (x=%s)' % (n, x)
     n1 = n / 2
     if n == 2:
         return 1./sqrt(2) * np.dot(np.array([[1,  1],
@@ -217,14 +217,13 @@ def cosIII(x, indent=0):
 
 def sinI(x, indent=0):
     nm1 = len(x)
-    print (' '*indent*4) + 'sinI n-1=%d (x=%s)' % (nm1, x)
+    #print (' '*indent*4) + 'sinI n-1=%d (x=%s)' % (nm1, x)
     n = nm1 + 1
     n1 = n / 2
     if n == 2:
         return np.array(x)
     if n >= 4:
         u = np.dot(sqrt(2) * Tt_m1(nm1), x)
-        print u
         assert len(u) == n-1
         v1 = cosIII(u[:n1], indent + 1)
         v2 = sinI(u[n1:], indent + 1)
@@ -251,13 +250,13 @@ for name, func, ref, delay, scale in tests:
     print '=== %s ===' % name
     fdct_ref = np.dot(ref(n + delay), samples)
     fdct_out = 1./scale(n) * func(samples)
-    print 'ref', fdct_ref
-    print 'out', fdct_out
     diffs = fdct_ref - fdct_out
     ok = True
     for diff in diffs:
         if abs(diff) > 1e-10:
             ok = False
+            print 'ref', fdct_ref
+            print 'out', fdct_out
             print 'cmp', diffs
             print 'FAIL'
             break
