@@ -105,7 +105,8 @@ def At_0(n):
                  sqrt(2))
     op2 = diag(np.array([[1]]), 1./sqrt(2) * op2m)
     op3 = diag(I(n1+1), (-1)**n1 * D(n1-1))
-    return np.dot(op1, op2, op3)
+    #XXX/WTF: not the same as np.dot(op1, op2, op3)
+    return np.dot(np.dot(op1, op2), op3)
 
 def At_m1(nm1):
     n = nm1 + 1
@@ -143,8 +144,8 @@ def Tt_0(n):
     n1 = n / 2
     op1 = diag(I(n1+1), D(n1-1))
     m00 = diag(ct(n, n1-1))
-    m01 = np.dot(diag(s(n, n1-1)), J(n1-1))
-    m10 = np.dot(-J(n1-1), diag(s(n, n1-1)))
+    m01 = np.dot(diag(st(n, n1-1)), J(n1-1))
+    m10 = np.dot(-J(n1-1), diag(st(n, n1-1)))
     m11 = diag(np.dot(J(n1-1), ct(n, n1-1)))
     m = quint(m00, m01, m10, m11, 1)
     op2 = diag(np.array([[1]]), m)
@@ -152,8 +153,10 @@ def Tt_0(n):
 
 c = lambda n, n1: [cos((2*k+1)*pi/(4*n)) for k in range(n1)]
 s = lambda n, n1: [sin((2*k+1)*pi/(4*n)) for k in range(n1)]
-ct = lambda n, n1m1: [cos(k*pi/(2*n)) for k in range(n1m1)]
-st = lambda n, n1m1: [sin(k*pi/(2*n)) for k in range(n1m1)]
+# XXX: page 6/37, paper has a mistake (range is set from 1 to n1-1 instead of 1
+# to n1)
+ct = lambda n, n1m1: [cos(k*pi/(2*n)) for k in range(1, n1m1+1)]
+st = lambda n, n1m1: [sin(k*pi/(2*n)) for k in range(1, n1m1+1)]
 
 def cosII(x, indent=0):
     n = len(x)
