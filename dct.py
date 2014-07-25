@@ -256,7 +256,7 @@ for name, func, ref, delay, scale in tests:
     diffs = fdct_ref - fdct_out
     ok = True
     for diff in diffs:
-        if abs(diff) > 1e-12:
+        if abs(diff) > 1e-10:
             ok = False
             print 'cmp', diffs
             print 'FAIL'
