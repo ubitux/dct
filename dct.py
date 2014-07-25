@@ -86,7 +86,7 @@ def P(n):
         col += 2
         if col >= n:
             col = 1
-    return m.T
+    return m
 
 def A_1(n):
     n1 = n / 2
@@ -166,7 +166,7 @@ def cosII(x, indent=0):
         u = np.dot(sqrt(2) * T_0(n), x)
         v1 = cosII(u[:n1], indent + 1)
         v2 = cosIV(u[n1:], indent + 1)
-        return np.dot(P(n), np.hstack((v1, v2)))
+        return np.dot(P(n).T, np.hstack((v1, v2)))
     assert False
 
 def cosIV(x, indent=0):
@@ -180,7 +180,7 @@ def cosIV(x, indent=0):
         v1 = cosII(u[:n1], indent + 1)
         v2 = cosII(u[n1:], indent + 1)
         w = np.dot(A_1(n), np.hstack((v1, v2)))
-        return np.dot(P(n), w)
+        return np.dot(P(n).T, w)
     assert False
 
 def cosI(x, indent=0):
@@ -195,7 +195,7 @@ def cosI(x, indent=0):
         u = np.dot(sqrt(2) * Tt_1(n+1), x)
         v1 = cosI(u[:n1+1], indent + 1)
         v2 = cosIII(u[n1+1:], indent + 1)
-        return np.dot(P(n + 1), np.hstack((v1, v2)))
+        return np.dot(P(n + 1).T, np.hstack((v1, v2)))
     assert False
 
 def cosIII(x, indent=0):
@@ -210,7 +210,7 @@ def cosIII(x, indent=0):
         v1 = cosI(u[:n1+1], indent + 1)
         v2 = sinI(u[n1+1:], indent + 1)
         w = np.dot(At_0(n), np.hstack((v1, v2)))
-        return np.dot(P(n), w)
+        return np.dot(P(n).T, w)
 
 def sinI(x, indent=0):
     nm1 = len(x)
@@ -226,7 +226,7 @@ def sinI(x, indent=0):
         v1 = cosIII(u[:n1], indent + 1)
         v2 = sinI(u[n1:], indent + 1)
         w = np.dot(At_m1(n - 1), np.hstack((v1, v2)))
-        return np.dot(P(n - 1), w)
+        return np.dot(P(n - 1).T, w)
     assert False
 
 t = int(sys.argv[1])
