@@ -77,13 +77,16 @@ I = lambda n: np.identity(n, dtype=int)
 J = lambda n: np.fliplr(I(n))
 D = lambda n: diag(np.array([(-1)**k for k in range(n)]))
 
-def P(v, n=None):
-    if n is None:
-        n = len(v)
-    while n > 2:
-        v = np.hstack((v[::2], v[1::2]))
-        n /= 2
-    return v
+def P(n):
+    #assert n >= 4
+    m = np.zeros((n, n))
+    col = 0
+    for i in range(n):
+        m[i, col] = 1
+        col += 2
+        if col >= n:
+            col = 1
+    return m.T
 
 def A_1(n):
     n1 = n / 2
@@ -163,7 +166,7 @@ def cosII(x, indent=0):
         u = np.dot(sqrt(2) * T_0(n), x)
         v1 = cosII(u[:n1], indent + 1)
         v2 = cosIV(u[n1:], indent + 1)
-        return P(np.hstack((v1, v2)))
+        return np.dot(P(n), np.hstack((v1, v2)))
     assert False
 
 def cosIV(x, indent=0):
@@ -177,7 +180,7 @@ def cosIV(x, indent=0):
         v1 = cosII(u[:n1], indent + 1)
         v2 = cosII(u[n1:], indent + 1)
         w = np.dot(A_1(n), np.hstack((v1, v2)))
-        return P(w)
+        return np.dot(P(n), w)
     assert False
 
 def cosI(x, indent=0):
@@ -192,8 +195,7 @@ def cosI(x, indent=0):
         u = np.dot(sqrt(2) * Tt_1(n+1), x)
         v1 = cosI(u[:n1+1], indent + 1)
         v2 = cosIII(u[n1+1:], indent + 1)
-        w = np.hstack((v1, v2))
-        return P(w, n + 1)
+        return np.dot(P(n + 1), np.hstack((v1, v2)))
     assert False
 
 def cosIII(x, indent=0):
@@ -208,7 +210,7 @@ def cosIII(x, indent=0):
         v1 = cosI(u[:n1+1], indent + 1)
         v2 = sinI(u[n1+1:], indent + 1)
         w = np.dot(At_0(n), np.hstack((v1, v2)))
-        return P(w)
+        return np.dot(P(n), w)
 
 def sinI(x, indent=0):
     nm1 = len(x)
@@ -224,7 +226,7 @@ def sinI(x, indent=0):
         v1 = cosIII(u[:n1], indent + 1)
         v2 = sinI(u[n1:], indent + 1)
         w = np.dot(At_m1(n - 1), np.hstack((v1, v2)))
-        return P(w, n - 1)
+        return np.dot(P(n - 1), w)
     assert False
 
 t = int(sys.argv[1])
@@ -232,11 +234,11 @@ n = 1<<t
 print '# t=%d -> n=%d' % (t, n)
 
 tests = [
-    #('cos I',   cosI,   C_I,   1, lambda n: sqrt(n/2)),
+    ('cos I',   cosI,   C_I,   1, lambda n: sqrt(n/2)),
     ('cos II',  cosII,  C_II,  0, lambda n: sqrt(n)),
-    #('cos III', cosIII, C_III, 0, lambda n: sqrt(n/2)),
+    ('cos III', cosIII, C_III, 0, lambda n: sqrt(n/2)),
     ('cos IV',  cosIV,  C_IV,  0, lambda n: sqrt(n)),
-    #('sin I',   sinI,   S_I,  -1, lambda n: sqrt(n/2)),
+    ('sin I',   sinI,   S_I,  -1, lambda n: sqrt(n/2)),
 ]
 
 for name, func, ref, delay, scale in tests:
