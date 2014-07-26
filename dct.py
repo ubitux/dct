@@ -169,75 +169,36 @@ s = lambda n, n1: [sin((2*k+1)*pi/(4*n)) for k in range(n1)]
 ct = lambda n, n1m1: [cos(k*pi/(2*n)) for k in range(1, n1m1+1)]
 st = lambda n, n1m1: [sin(k*pi/(2*n)) for k in range(1, n1m1+1)]
 
-def cosII(x):
-    n = len(x)
+def rectpl(x, neq2_mat, n_delay,
+           twiddle_mat, add_mat, b,
+           v1_func, v2_func, hvec_size_add):
+    n_orig = len(x)
+    n = n_orig + n_delay
     n1 = n / 2
     if n == 2:
-        return np.array([[1,  1],
-                         [1, -1]]).dot(x)
+        return neq2_mat.dot(x)
     if n >= 4:
-        u = sqrt(2) * twiddle_m(n, 0).dot(x)
-        v1 = cosII(u[:n1])
-        v2 = cosIV(u[n1:])
-        w = add_m(n, 0).dot(np.hstack((v1, v2)))
-        return permute_m(n).T.dot(w)
+        u = sqrt(2) * twiddle_mat(n, b).dot(x)
+        v1 = v1_func(u[:n1+hvec_size_add])
+        v2 = v2_func(u[n1+hvec_size_add:])
+        w = add_mat(n, b).dot(np.hstack((v1, v2)))
+        return permute_m(n_orig).T.dot(w)
     assert False
 
-def cosIV(x):
-    n = len(x)
-    n1 = n / 2
-    if n == 2:
-        return sqrt(2) * C_IV(2).dot(x)
-    if n >= 4:
-        u = sqrt(2) * twiddle_m(n, 1).dot(x)
-        v1 = cosII(u[:n1])
-        v2 = cosII(u[n1:])
-        w = add_m(n, 1).dot(np.hstack((v1, v2)))
-        return permute_m(n).T.dot(w)
-    assert False
+cosII_neq2_mat = np.array([[1,  1],
+                           [1, -1]])
+cosIV_neq2_mat = sqrt(2) * C_IV(2)
+cosI_neq2_mat  = 1./2 * (np.array([[1,1,0],[0,0,sqrt(2)],[1,-1,0]]).dot(
+                         np.array([[1,0,1],[0,sqrt(2),0],[1,0,-1]])))
+cosIII_neq2_mat = 1./sqrt(2) * np.array([[1,  1],
+                                         [1, -1]])
+sinI_neq2_mat = I(1)
 
-def cosI(x):
-    np1 = len(x)
-    n = np1 - 1
-    n1 = n / 2
-    if n == 2:
-        return 1./2 * (np.array([[1,1,0],[0,0,sqrt(2)],[1,-1,0]]).dot(
-                       np.array([[1,0,1],[0,sqrt(2),0],[1,0,-1]]))).dot(x)
-    if n >= 4:
-        u = sqrt(2) * twiddle_m2(n, 1).dot(x)
-        v1 = cosI(u[:n1+1])
-        v2 = cosIII(u[n1+1:])
-        w = add_m2(n, 1).dot(np.hstack((v1, v2)))
-        return permute_m(n + 1).T.dot(w)
-    assert False
-
-def cosIII(x):
-    n = len(x)
-    n1 = n / 2
-    if n == 2:
-        return 1./sqrt(2) * np.array([[1,  1],
-                                      [1, -1]]).dot(x)
-    if n >= 4:
-        u = sqrt(2) * twiddle_m2(n, 0).dot(x)
-        v1 = cosI(u[:n1+1])
-        v2 = sinI(u[n1+1:])
-        w = add_m2(n, 0).dot(np.hstack((v1, v2)))
-        return permute_m(n).T.dot(w)
-
-def sinI(x):
-    nm1 = len(x)
-    n = nm1 + 1
-    n1 = n / 2
-    if n == 2:
-        return np.array(x)
-    if n >= 4:
-        u = sqrt(2) * twiddle_m2(n, -1).dot(x)
-        assert len(u) == n-1
-        v1 = cosIII(u[:n1])
-        v2 = sinI(u[n1:])
-        w = add_m2(n, -1).dot(np.hstack((v1, v2)))
-        return permute_m(n - 1).T.dot(w)
-    assert False
+cosII  = lambda x: rectpl(x, cosII_neq2_mat,   0, twiddle_m,  add_m,   0, cosII,  cosIV,  0)
+cosIV  = lambda x: rectpl(x, cosIV_neq2_mat,   0, twiddle_m,  add_m,   1, cosII,  cosII,  0)
+cosI   = lambda x: rectpl(x, cosI_neq2_mat,   -1, twiddle_m2, add_m2,  1, cosI,   cosIII, 1)
+cosIII = lambda x: rectpl(x, cosIII_neq2_mat,  0, twiddle_m2, add_m2,  0, cosI,   sinI,   1)
+sinI   = lambda x: rectpl(x, sinI_neq2_mat,    1, twiddle_m2, add_m2, -1, cosIII, sinI,   0)
 
 t = int(sys.argv[1])
 n = 1<<t
