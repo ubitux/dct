@@ -40,6 +40,10 @@ def quint(a, b, c, d, x):
 def diag(a, b=None):
     if b is None:
         return a * I(len(a))
+    if isinstance(a, int) or isinstance(a, float):
+        a = np.array([[a]])
+    if isinstance(b, int) or isinstance(b, float):
+        b = np.array([[b]])
     return quad((a, np.zeros((a.shape[0], b.shape[1]))),
                 (np.zeros((b.shape[0], a.shape[1])), b))
 
@@ -93,7 +97,7 @@ def A_1(n):
     isq2_n1m1 = I(n1-1) * 1./sqrt(2)
     m = 1./sqrt(2) * quad((I(n1-1),  I(n1-1)),
                           (I(n1-1), -I(n1-1)))
-    op1 = diag(diag(np.array([[1]]), m), np.array([[-1]]))
+    op1 = diag(diag(1, m), -1)
     op2 = diag(I(n1), np.dot(D(n1), J(n1)))
     return np.dot(op1, op2)
 
@@ -103,7 +107,7 @@ def At_0(n):
     op2m = quint(I(n1-1),  J(n1-1),
                  J(n1-1), -I(n1-1),
                  sqrt(2))
-    op2 = diag(np.array([[1]]), 1./sqrt(2) * op2m)
+    op2 = diag(1, 1./sqrt(2) * op2m)
     op3 = diag(I(n1+1), (-1)**n1 * D(n1-1))
     #XXX/WTF: not the same as np.dot(op1, op2, op3)
     return np.dot(np.dot(op1, op2), op3)
