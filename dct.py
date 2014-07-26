@@ -162,38 +162,35 @@ s = lambda n, n1: [sin((2*k+1)*pi/(4*n)) for k in range(n1)]
 ct = lambda n, n1m1: [cos(k*pi/(2*n)) for k in range(1, n1m1+1)]
 st = lambda n, n1m1: [sin(k*pi/(2*n)) for k in range(1, n1m1+1)]
 
-def cosII(x, indent=0):
+def cosII(x):
     n = len(x)
-    #print (' '*indent*4) + 'cosII n=%d (x=%s)' % (n, x)
     n1 = n / 2
     if n == 2:
         return np.array([[1,  1],
                          [1, -1]]).dot(x)
     if n >= 4:
         u = sqrt(2) * T(n, 0).dot(x)
-        v1 = cosII(u[:n1], indent + 1)
-        v2 = cosIV(u[n1:], indent + 1)
+        v1 = cosII(u[:n1])
+        v2 = cosIV(u[n1:])
         w = A(n, 0).dot(np.hstack((v1, v2)))
         return P(n).T.dot(w)
     assert False
 
-def cosIV(x, indent=0):
+def cosIV(x):
     n = len(x)
-    #print (' '*indent*4) + 'cosIV n=%d (x=%s)' % (n, x)
     n1 = n / 2
     if n == 2:
         return sqrt(2) * C_IV(2).dot(x)
     if n >= 4:
         u = sqrt(2) * T(n, 1).dot(x)
-        v1 = cosII(u[:n1], indent + 1)
-        v2 = cosII(u[n1:], indent + 1)
+        v1 = cosII(u[:n1])
+        v2 = cosII(u[n1:])
         w = A(n, 1).dot(np.hstack((v1, v2)))
         return P(n).T.dot(w)
     assert False
 
-def cosI(x, indent=0):
+def cosI(x):
     np1 = len(x)
-    #print (' '*indent*4) + 'cosI n+1=%d (x=%s)' % (np1, x)
     n = np1 - 1
     n1 = n / 2
     if n == 2:
@@ -201,29 +198,27 @@ def cosI(x, indent=0):
                        np.array([[1,0,1],[0,sqrt(2),0],[1,0,-1]]))).dot(x)
     if n >= 4:
         u = sqrt(2) * Tt(n, 1).dot(x)
-        v1 = cosI(u[:n1+1], indent + 1)
-        v2 = cosIII(u[n1+1:], indent + 1)
+        v1 = cosI(u[:n1+1])
+        v2 = cosIII(u[n1+1:])
         w = At(n, 1).dot(np.hstack((v1, v2)))
         return P(n + 1).T.dot(w)
     assert False
 
-def cosIII(x, indent=0):
+def cosIII(x):
     n = len(x)
-    #print (' '*indent*4) + 'cosIII n=%d (x=%s)' % (n, x)
     n1 = n / 2
     if n == 2:
         return 1./sqrt(2) * np.array([[1,  1],
                                       [1, -1]]).dot(x)
     if n >= 4:
         u = sqrt(2) * Tt(n, 0).dot(x)
-        v1 = cosI(u[:n1+1], indent + 1)
-        v2 = sinI(u[n1+1:], indent + 1)
+        v1 = cosI(u[:n1+1])
+        v2 = sinI(u[n1+1:])
         w = At(n, 0).dot(np.hstack((v1, v2)))
         return P(n).T.dot(w)
 
-def sinI(x, indent=0):
+def sinI(x):
     nm1 = len(x)
-    #print (' '*indent*4) + 'sinI n-1=%d (x=%s)' % (nm1, x)
     n = nm1 + 1
     n1 = n / 2
     if n == 2:
@@ -231,8 +226,8 @@ def sinI(x, indent=0):
     if n >= 4:
         u = sqrt(2) * Tt(n, -1).dot(x)
         assert len(u) == n-1
-        v1 = cosIII(u[:n1], indent + 1)
-        v2 = sinI(u[n1:], indent + 1)
+        v1 = cosIII(u[:n1])
+        v2 = sinI(u[n1:])
         w = At(n, -1).dot(np.hstack((v1, v2)))
         return P(n - 1).T.dot(w)
     assert False
