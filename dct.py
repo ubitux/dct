@@ -247,8 +247,7 @@ tests = [
 for name, func, ref, delay, scale in tests:
     samples = random.sample(range(0x100), n + delay)
 
-    print
-    print '=== %s ===' % name
+    print '%s(%d)...' % (name, n),
     fdct_ref = ref(n + delay).dot(samples)
     fdct_out = 1./scale(n) * func(samples)
     diffs = fdct_ref - fdct_out
@@ -256,6 +255,7 @@ for name, func, ref, delay, scale in tests:
     for diff in diffs:
         if abs(diff) > 1e-10:
             ok = False
+            print
             print 'ref', fdct_ref
             print 'out', fdct_out
             print 'cmp', diffs
