@@ -98,8 +98,8 @@ def A_1(n):
     m = 1./sqrt(2) * quad((I(n1-1),  I(n1-1)),
                           (I(n1-1), -I(n1-1)))
     op1 = diag(diag(1, m), -1)
-    op2 = diag(I(n1), np.dot(D(n1), J(n1)))
-    return np.dot(op1, op2)
+    op2 = diag(I(n1), D(n1).dot(J(n1)))
+    return op1.dot(op2)
 
 def At_0(n):
     n1 = n / 2
@@ -109,8 +109,7 @@ def At_0(n):
                  sqrt(2))
     op2 = diag(1, 1./sqrt(2) * op2m)
     op3 = diag(I(n1+1), (-1)**n1 * D(n1-1))
-    #XXX/WTF: not the same as np.dot(op1, op2, op3)
-    return np.dot(np.dot(op1, op2), op3)
+    return op1.dot(op2).dot(op3)
 
 def At_m1(nm1):
     n = nm1 + 1
@@ -124,12 +123,12 @@ def T(n, b):
                                  (I(n1), -J(n1)))
     elif b == 1:
         m00 = diag(c(n, n1))
-        m01 = np.dot(diag(s(n, n1)), J(n1))
-        m10 = np.dot(-J(n1), diag(s(n, n1)))
-        m11 = diag(np.dot(J(n1), c(n, n1)))
+        m01 = diag(s(n, n1)).dot(J(n1))
+        m10 = (-J(n1)).dot(diag(s(n, n1)))
+        m11 = diag(J(n1).dot(c(n, n1)))
         op1 = diag(I(n1), D(n1))
         op2 = quad((m00, m01), (m10, m11))
-        return np.dot(op1, op2)
+        return op1.dot(op2)
     assert False
 
 def Tt(n, b):
@@ -141,14 +140,14 @@ def Tt(n, b):
     elif b == 0:
         op1 = diag(I(n1+1), D(n1-1))
         m00 = diag(ct(n, n1-1))
-        m01 = np.dot(diag(st(n, n1-1)), J(n1-1))
-        m10 = np.dot(-J(n1-1), diag(st(n, n1-1)))
-        m11 = diag(np.dot(J(n1-1), ct(n, n1-1)))
+        m01 = diag(st(n, n1-1)).dot(J(n1-1))
+        m10 = (-J(n1-1)).dot(diag(st(n, n1-1)))
+        m11 = diag(J(n1-1).dot(ct(n, n1-1)))
         m = quint(m00, m01, m10, m11, 1)
         op2 = diag(np.array([[1]]), m)
-        return np.dot(op1, op2)
+        return op1.dot(op2)
     elif b == -1:
-        return np.dot(diag(J(n1), I(n1-1)), Tt(n-1, 1))
+        return diag(J(n1), I(n1-1)).dot(Tt(n-1, 1))
     assert False
 
 c = lambda n, n1: [cos((2*k+1)*pi/(4*n)) for k in range(n1)]
@@ -163,13 +162,13 @@ def cosII(x, indent=0):
     #print (' '*indent*4) + 'cosII n=%d (x=%s)' % (n, x)
     n1 = n / 2
     if n == 2:
-        return np.dot(np.array([[1,  1],
-                                [1, -1]]), x)
+        return np.array([[1,  1],
+                         [1, -1]]).dot(x)
     if n >= 4:
-        u = np.dot(sqrt(2) * T(n, 0), x)
+        u = sqrt(2) * T(n, 0).dot(x)
         v1 = cosII(u[:n1], indent + 1)
         v2 = cosIV(u[n1:], indent + 1)
-        return np.dot(P(n).T, np.hstack((v1, v2)))
+        return P(n).T.dot(np.hstack((v1, v2)))
     assert False
 
 def cosIV(x, indent=0):
@@ -177,13 +176,13 @@ def cosIV(x, indent=0):
     #print (' '*indent*4) + 'cosIV n=%d (x=%s)' % (n, x)
     n1 = n / 2
     if n == 2:
-        return sqrt(2) * np.dot(C_IV(2), x)
+        return sqrt(2) * C_IV(2).dot(x)
     if n >= 4:
-        u = np.dot(sqrt(2) * T(n, 1), x)
+        u = sqrt(2) * T(n, 1).dot(x)
         v1 = cosII(u[:n1], indent + 1)
         v2 = cosII(u[n1:], indent + 1)
-        w = np.dot(A_1(n), np.hstack((v1, v2)))
-        return np.dot(P(n).T, w)
+        w = A_1(n).dot(np.hstack((v1, v2)))
+        return P(n).T.dot(w)
     assert False
 
 def cosI(x, indent=0):
@@ -192,13 +191,13 @@ def cosI(x, indent=0):
     n = np1 - 1
     n1 = n / 2
     if n == 2:
-        return 1./2 * np.dot(np.dot(np.array([[1,1,0],[0,0,sqrt(2)],[1,-1,0]]),
-                                    np.array([[1,0,1],[0,sqrt(2),0],[1,0,-1]])), x)
+        return 1./2 * (np.array([[1,1,0],[0,0,sqrt(2)],[1,-1,0]]).dot(
+                       np.array([[1,0,1],[0,sqrt(2),0],[1,0,-1]]))).dot(x)
     if n >= 4:
-        u = np.dot(sqrt(2) * Tt(n, 1), x)
+        u = sqrt(2) * Tt(n, 1).dot(x)
         v1 = cosI(u[:n1+1], indent + 1)
         v2 = cosIII(u[n1+1:], indent + 1)
-        return np.dot(P(n + 1).T, np.hstack((v1, v2)))
+        return P(n + 1).T.dot(np.hstack((v1, v2)))
     assert False
 
 def cosIII(x, indent=0):
@@ -206,14 +205,14 @@ def cosIII(x, indent=0):
     #print (' '*indent*4) + 'cosIII n=%d (x=%s)' % (n, x)
     n1 = n / 2
     if n == 2:
-        return 1./sqrt(2) * np.dot(np.array([[1,  1],
-                                             [1, -1]]), x)
+        return 1./sqrt(2) * np.array([[1,  1],
+                                      [1, -1]]).dot(x)
     if n >= 4:
-        u = np.dot(sqrt(2) * Tt(n, 0), x)
+        u = sqrt(2) * Tt(n, 0).dot(x)
         v1 = cosI(u[:n1+1], indent + 1)
         v2 = sinI(u[n1+1:], indent + 1)
-        w = np.dot(At_0(n), np.hstack((v1, v2)))
-        return np.dot(P(n).T, w)
+        w = At_0(n).dot(np.hstack((v1, v2)))
+        return P(n).T.dot(w)
 
 def sinI(x, indent=0):
     nm1 = len(x)
@@ -223,12 +222,12 @@ def sinI(x, indent=0):
     if n == 2:
         return np.array(x)
     if n >= 4:
-        u = np.dot(sqrt(2) * Tt(n, -1), x)
+        u = sqrt(2) * Tt(n, -1).dot(x)
         assert len(u) == n-1
         v1 = cosIII(u[:n1], indent + 1)
         v2 = sinI(u[n1:], indent + 1)
-        w = np.dot(At_m1(n - 1), np.hstack((v1, v2)))
-        return np.dot(P(n - 1).T, w)
+        w = At_m1(n - 1).dot(np.hstack((v1, v2)))
+        return P(n - 1).T.dot(w)
     assert False
 
 t = int(sys.argv[1])
@@ -248,7 +247,7 @@ for name, func, ref, delay, scale in tests:
 
     print
     print '=== %s ===' % name
-    fdct_ref = np.dot(ref(n + delay), samples)
+    fdct_ref = ref(n + delay).dot(samples)
     fdct_out = 1./scale(n) * func(samples)
     diffs = fdct_ref - fdct_out
     ok = True
