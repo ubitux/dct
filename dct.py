@@ -113,43 +113,39 @@ def At_m1(nm1):
     n1 = n / 2
     return diag(D(n1), I(n1 - 1))
 
-def T_0(n):
+def T(n, b):
     n1 = n / 2
-    return 1./sqrt(2) * quad((I(n1),  J(n1)),
-                             (I(n1), -J(n1)))
+    if b == 0:
+        return 1./sqrt(2) * quad((I(n1),  J(n1)),
+                                 (I(n1), -J(n1)))
+    elif b == 1:
+        m00 = diag(c(n, n1))
+        m01 = np.dot(diag(s(n, n1)), J(n1))
+        m10 = np.dot(-J(n1), diag(s(n, n1)))
+        m11 = diag(np.dot(J(n1), c(n, n1)))
+        op1 = diag(I(n1), D(n1))
+        op2 = quad((m00, m01), (m10, m11))
+        return np.dot(op1, op2)
+    assert False
 
-def Tt_1(np1):
-    n = np1 - 1
+def Tt(n, b):
     n1 = n / 2
-    return 1./sqrt(2) * quint(I(n1),  J(n1),
-                              I(n1), -J(n1),
-                              sqrt(2))
-
-def Tt_m1(nm1):
-    n = nm1 + 1
-    n1 = n / 2
-    return np.dot(diag(J(n1), I(n1-1)), Tt_1(nm1))
-
-def T_1(n):
-    n1 = n / 2
-    m00 = diag(c(n, n1))
-    m01 = np.dot(diag(s(n, n1)), J(n1))
-    m10 = np.dot(-J(n1), diag(s(n, n1)))
-    m11 = diag(np.dot(J(n1), c(n, n1)))
-    op1 = diag(I(n1), D(n1))
-    op2 = quad((m00, m01), (m10, m11))
-    return np.dot(op1, op2)
-
-def Tt_0(n):
-    n1 = n / 2
-    op1 = diag(I(n1+1), D(n1-1))
-    m00 = diag(ct(n, n1-1))
-    m01 = np.dot(diag(st(n, n1-1)), J(n1-1))
-    m10 = np.dot(-J(n1-1), diag(st(n, n1-1)))
-    m11 = diag(np.dot(J(n1-1), ct(n, n1-1)))
-    m = quint(m00, m01, m10, m11, 1)
-    op2 = diag(np.array([[1]]), m)
-    return np.dot(op1, op2)
+    if b == 1:
+        return 1./sqrt(2) * quint(I(n1),  J(n1),
+                                  I(n1), -J(n1),
+                                  sqrt(2))
+    elif b == 0:
+        op1 = diag(I(n1+1), D(n1-1))
+        m00 = diag(ct(n, n1-1))
+        m01 = np.dot(diag(st(n, n1-1)), J(n1-1))
+        m10 = np.dot(-J(n1-1), diag(st(n, n1-1)))
+        m11 = diag(np.dot(J(n1-1), ct(n, n1-1)))
+        m = quint(m00, m01, m10, m11, 1)
+        op2 = diag(np.array([[1]]), m)
+        return np.dot(op1, op2)
+    elif b == -1:
+        return np.dot(diag(J(n1), I(n1-1)), Tt(n-1, 1))
+    assert False
 
 c = lambda n, n1: [cos((2*k+1)*pi/(4*n)) for k in range(n1)]
 s = lambda n, n1: [sin((2*k+1)*pi/(4*n)) for k in range(n1)]
@@ -166,7 +162,7 @@ def cosII(x, indent=0):
         return np.dot(np.array([[1,  1],
                                 [1, -1]]), x)
     if n >= 4:
-        u = np.dot(sqrt(2) * T_0(n), x)
+        u = np.dot(sqrt(2) * T(n, 0), x)
         v1 = cosII(u[:n1], indent + 1)
         v2 = cosIV(u[n1:], indent + 1)
         return np.dot(P(n).T, np.hstack((v1, v2)))
@@ -179,7 +175,7 @@ def cosIV(x, indent=0):
     if n == 2:
         return sqrt(2) * np.dot(C_IV(2), x)
     if n >= 4:
-        u = np.dot(sqrt(2) * T_1(n), x)
+        u = np.dot(sqrt(2) * T(n, 1), x)
         v1 = cosII(u[:n1], indent + 1)
         v2 = cosII(u[n1:], indent + 1)
         w = np.dot(A_1(n), np.hstack((v1, v2)))
@@ -195,7 +191,7 @@ def cosI(x, indent=0):
         return 1./2 * np.dot(np.dot(np.array([[1,1,0],[0,0,sqrt(2)],[1,-1,0]]),
                                     np.array([[1,0,1],[0,sqrt(2),0],[1,0,-1]])), x)
     if n >= 4:
-        u = np.dot(sqrt(2) * Tt_1(n+1), x)
+        u = np.dot(sqrt(2) * Tt(n, 1), x)
         v1 = cosI(u[:n1+1], indent + 1)
         v2 = cosIII(u[n1+1:], indent + 1)
         return np.dot(P(n + 1).T, np.hstack((v1, v2)))
@@ -209,7 +205,7 @@ def cosIII(x, indent=0):
         return 1./sqrt(2) * np.dot(np.array([[1,  1],
                                              [1, -1]]), x)
     if n >= 4:
-        u = np.dot(sqrt(2) * Tt_0(n), x)
+        u = np.dot(sqrt(2) * Tt(n, 0), x)
         v1 = cosI(u[:n1+1], indent + 1)
         v2 = sinI(u[n1+1:], indent + 1)
         w = np.dot(At_0(n), np.hstack((v1, v2)))
@@ -223,7 +219,7 @@ def sinI(x, indent=0):
     if n == 2:
         return np.array(x)
     if n >= 4:
-        u = np.dot(sqrt(2) * Tt_m1(nm1), x)
+        u = np.dot(sqrt(2) * Tt(n, -1), x)
         assert len(u) == n-1
         v1 = cosIII(u[:n1], indent + 1)
         v2 = sinI(u[n1:], indent + 1)
