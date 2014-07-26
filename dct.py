@@ -92,29 +92,34 @@ def P(n):
             col = 1
     return m
 
-def A_1(n):
+def A(n, b):
     n1 = n / 2
-    isq2_n1m1 = I(n1-1) * 1./sqrt(2)
-    m = 1./sqrt(2) * quad((I(n1-1),  I(n1-1)),
-                          (I(n1-1), -I(n1-1)))
-    op1 = diag(diag(1, m), -1)
-    op2 = diag(I(n1), D(n1).dot(J(n1)))
-    return op1.dot(op2)
+    if b == 0:
+        return I(n)
+    elif b == 1:
+        isq2_n1m1 = I(n1-1) * 1./sqrt(2)
+        m = 1./sqrt(2) * quad((I(n1-1),  I(n1-1)),
+                              (I(n1-1), -I(n1-1)))
+        op1 = diag(diag(1, m), -1)
+        op2 = diag(I(n1), D(n1).dot(J(n1)))
+        return op1.dot(op2)
+    assert False
 
-def At_0(n):
+def At(n, b):
     n1 = n / 2
-    op1 = diag(I(n1), J(n1))
-    op2m = quint(I(n1-1),  J(n1-1),
-                 J(n1-1), -I(n1-1),
-                 sqrt(2))
-    op2 = diag(1, 1./sqrt(2) * op2m)
-    op3 = diag(I(n1+1), (-1)**n1 * D(n1-1))
-    return op1.dot(op2).dot(op3)
-
-def At_m1(nm1):
-    n = nm1 + 1
-    n1 = n / 2
-    return diag(D(n1), I(n1 - 1))
+    if b == 1:
+        return I(n + 1)
+    elif b == 0:
+        op1 = diag(I(n1), J(n1))
+        op2m = quint(I(n1-1),  J(n1-1),
+                     J(n1-1), -I(n1-1),
+                     sqrt(2))
+        op2 = diag(1, 1./sqrt(2) * op2m)
+        op3 = diag(I(n1+1), (-1)**n1 * D(n1-1))
+        return op1.dot(op2).dot(op3)
+    elif b == -1:
+        return diag(D(n1), I(n1 - 1))
+    assert False
 
 def T(n, b):
     n1 = n / 2
@@ -168,7 +173,8 @@ def cosII(x, indent=0):
         u = sqrt(2) * T(n, 0).dot(x)
         v1 = cosII(u[:n1], indent + 1)
         v2 = cosIV(u[n1:], indent + 1)
-        return P(n).T.dot(np.hstack((v1, v2)))
+        w = A(n, 0).dot(np.hstack((v1, v2)))
+        return P(n).T.dot(w)
     assert False
 
 def cosIV(x, indent=0):
@@ -181,7 +187,7 @@ def cosIV(x, indent=0):
         u = sqrt(2) * T(n, 1).dot(x)
         v1 = cosII(u[:n1], indent + 1)
         v2 = cosII(u[n1:], indent + 1)
-        w = A_1(n).dot(np.hstack((v1, v2)))
+        w = A(n, 1).dot(np.hstack((v1, v2)))
         return P(n).T.dot(w)
     assert False
 
@@ -197,7 +203,8 @@ def cosI(x, indent=0):
         u = sqrt(2) * Tt(n, 1).dot(x)
         v1 = cosI(u[:n1+1], indent + 1)
         v2 = cosIII(u[n1+1:], indent + 1)
-        return P(n + 1).T.dot(np.hstack((v1, v2)))
+        w = At(n, 1).dot(np.hstack((v1, v2)))
+        return P(n + 1).T.dot(w)
     assert False
 
 def cosIII(x, indent=0):
@@ -211,7 +218,7 @@ def cosIII(x, indent=0):
         u = sqrt(2) * Tt(n, 0).dot(x)
         v1 = cosI(u[:n1+1], indent + 1)
         v2 = sinI(u[n1+1:], indent + 1)
-        w = At_0(n).dot(np.hstack((v1, v2)))
+        w = At(n, 0).dot(np.hstack((v1, v2)))
         return P(n).T.dot(w)
 
 def sinI(x, indent=0):
@@ -226,7 +233,7 @@ def sinI(x, indent=0):
         assert len(u) == n-1
         v1 = cosIII(u[:n1], indent + 1)
         v2 = sinI(u[n1:], indent + 1)
-        w = At_m1(n - 1).dot(np.hstack((v1, v2)))
+        w = At(n, -1).dot(np.hstack((v1, v2)))
         return P(n - 1).T.dot(w)
     assert False
 
