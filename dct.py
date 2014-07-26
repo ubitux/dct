@@ -37,6 +37,8 @@ def quint(a, b, c, d, x):
     m[bh+1:, cw+1:] = d
     return m
 
+# a 0
+# 0 b
 def diag(a, b=None):
     if b is None:
         return a * I(len(a))
