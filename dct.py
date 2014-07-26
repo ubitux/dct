@@ -245,7 +245,7 @@ tests = [
 ]
 
 for name, func, ref, delay, scale in tests:
-    samples = random.sample(range(0x100), n + delay)
+    samples = [random.randint(0x00, 0xff) for x in range(n + delay)]
 
     print '%s(%d)...' % (name, n),
     fdct_ref = ref(n + delay).dot(samples)
