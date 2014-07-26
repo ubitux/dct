@@ -83,7 +83,8 @@ I = lambda n: np.identity(n, dtype=int)
 J = lambda n: np.fliplr(I(n))
 D = lambda n: diag(np.array([(-1)**k for k in range(n)]))
 
-def P(n):
+def permute_m(n):
+    '''Permutation matrix (not transposed), defined as P in the paper'''
     #assert n >= 4
     m = np.zeros((n, n))
     col = 0
@@ -94,7 +95,8 @@ def P(n):
             col = 1
     return m
 
-def A(n, b):
+def add_m(n, b):
+    '''Addition matrix, defined as A in the paper'''
     n1 = n / 2
     if b == 0:
         return I(n)
@@ -107,7 +109,8 @@ def A(n, b):
         return op1.dot(op2)
     assert False
 
-def At(n, b):
+def add_m2(n, b):
+    '''Second addition matrix, defined as A~ in the paper'''
     n1 = n / 2
     if b == 1:
         return I(n + 1)
@@ -123,7 +126,8 @@ def At(n, b):
         return diag(D(n1), I(n1 - 1))
     assert False
 
-def T(n, b):
+def twiddle_m(n, b):
+    '''Twiddle matrix, defined as T in the paper'''
     n1 = n / 2
     if b == 0:
         return 1./sqrt(2) * quad((I(n1),  J(n1)),
@@ -138,7 +142,8 @@ def T(n, b):
         return op1.dot(op2)
     assert False
 
-def Tt(n, b):
+def twiddle_m2(n, b):
+    '''Second twiddle matrix, defined as T~ in the paper'''
     n1 = n / 2
     if b == 1:
         return 1./sqrt(2) * quint(I(n1),  J(n1),
@@ -154,7 +159,7 @@ def Tt(n, b):
         op2 = diag(1, m)
         return op1.dot(op2)
     elif b == -1:
-        return diag(J(n1), I(n1-1)).dot(Tt(n-1, 1))
+        return diag(J(n1), I(n1-1)).dot(twiddle_m2(n-1, 1))
     assert False
 
 c = lambda n, n1: [cos((2*k+1)*pi/(4*n)) for k in range(n1)]
@@ -171,11 +176,11 @@ def cosII(x):
         return np.array([[1,  1],
                          [1, -1]]).dot(x)
     if n >= 4:
-        u = sqrt(2) * T(n, 0).dot(x)
+        u = sqrt(2) * twiddle_m(n, 0).dot(x)
         v1 = cosII(u[:n1])
         v2 = cosIV(u[n1:])
-        w = A(n, 0).dot(np.hstack((v1, v2)))
-        return P(n).T.dot(w)
+        w = add_m(n, 0).dot(np.hstack((v1, v2)))
+        return permute_m(n).T.dot(w)
     assert False
 
 def cosIV(x):
@@ -184,11 +189,11 @@ def cosIV(x):
     if n == 2:
         return sqrt(2) * C_IV(2).dot(x)
     if n >= 4:
-        u = sqrt(2) * T(n, 1).dot(x)
+        u = sqrt(2) * twiddle_m(n, 1).dot(x)
         v1 = cosII(u[:n1])
         v2 = cosII(u[n1:])
-        w = A(n, 1).dot(np.hstack((v1, v2)))
-        return P(n).T.dot(w)
+        w = add_m(n, 1).dot(np.hstack((v1, v2)))
+        return permute_m(n).T.dot(w)
     assert False
 
 def cosI(x):
@@ -199,11 +204,11 @@ def cosI(x):
         return 1./2 * (np.array([[1,1,0],[0,0,sqrt(2)],[1,-1,0]]).dot(
                        np.array([[1,0,1],[0,sqrt(2),0],[1,0,-1]]))).dot(x)
     if n >= 4:
-        u = sqrt(2) * Tt(n, 1).dot(x)
+        u = sqrt(2) * twiddle_m2(n, 1).dot(x)
         v1 = cosI(u[:n1+1])
         v2 = cosIII(u[n1+1:])
-        w = At(n, 1).dot(np.hstack((v1, v2)))
-        return P(n + 1).T.dot(w)
+        w = add_m2(n, 1).dot(np.hstack((v1, v2)))
+        return permute_m(n + 1).T.dot(w)
     assert False
 
 def cosIII(x):
@@ -213,11 +218,11 @@ def cosIII(x):
         return 1./sqrt(2) * np.array([[1,  1],
                                       [1, -1]]).dot(x)
     if n >= 4:
-        u = sqrt(2) * Tt(n, 0).dot(x)
+        u = sqrt(2) * twiddle_m2(n, 0).dot(x)
         v1 = cosI(u[:n1+1])
         v2 = sinI(u[n1+1:])
-        w = At(n, 0).dot(np.hstack((v1, v2)))
-        return P(n).T.dot(w)
+        w = add_m2(n, 0).dot(np.hstack((v1, v2)))
+        return permute_m(n).T.dot(w)
 
 def sinI(x):
     nm1 = len(x)
@@ -226,12 +231,12 @@ def sinI(x):
     if n == 2:
         return np.array(x)
     if n >= 4:
-        u = sqrt(2) * Tt(n, -1).dot(x)
+        u = sqrt(2) * twiddle_m2(n, -1).dot(x)
         assert len(u) == n-1
         v1 = cosIII(u[:n1])
         v2 = sinI(u[n1:])
-        w = At(n, -1).dot(np.hstack((v1, v2)))
-        return P(n - 1).T.dot(w)
+        w = add_m2(n, -1).dot(np.hstack((v1, v2)))
+        return permute_m(n - 1).T.dot(w)
     assert False
 
 t = int(sys.argv[1])
