@@ -200,34 +200,35 @@ cosI   = lambda x: rectpl(x, cosI_neq2_mat,   -1, twiddle_m2, add_m2,  1, cosI, 
 cosIII = lambda x: rectpl(x, cosIII_neq2_mat,  0, twiddle_m2, add_m2,  0, cosI,   sinI,   1)
 sinI   = lambda x: rectpl(x, sinI_neq2_mat,    1, twiddle_m2, add_m2, -1, cosIII, sinI,   0)
 
-t = int(sys.argv[1])
-n = 1<<t
-print '# t=%d -> n=%d' % (t, n)
+if __name__ == '__main__':
+    t = int(sys.argv[1])
+    n = 1<<t
+    print '# t=%d -> n=%d' % (t, n)
 
-tests = [
-    ('cos I',   cosI,   C_I,   1, lambda n: sqrt(n/2)),
-    ('cos II',  cosII,  C_II,  0, lambda n: sqrt(n)),
-    ('cos III', cosIII, C_III, 0, lambda n: sqrt(n/2)),
-    ('cos IV',  cosIV,  C_IV,  0, lambda n: sqrt(n)),
-    ('sin I',   sinI,   S_I,  -1, lambda n: sqrt(n/2)),
-]
+    tests = [
+        ('cos I',   cosI,   C_I,   1, lambda n: sqrt(n/2)),
+        ('cos II',  cosII,  C_II,  0, lambda n: sqrt(n)),
+        ('cos III', cosIII, C_III, 0, lambda n: sqrt(n/2)),
+        ('cos IV',  cosIV,  C_IV,  0, lambda n: sqrt(n)),
+        ('sin I',   sinI,   S_I,  -1, lambda n: sqrt(n/2)),
+    ]
 
-for name, func, ref, delay, scale in tests:
-    samples = [random.randint(0x00, 0xff) for x in range(n + delay)]
+    for name, func, ref, delay, scale in tests:
+        samples = [random.randint(0x00, 0xff) for x in range(n + delay)]
 
-    print '%s(%d)...' % (name, n),
-    fdct_ref = ref(n + delay).dot(samples)
-    fdct_out = 1./scale(n) * func(samples)
-    diffs = fdct_ref - fdct_out
-    ok = True
-    for diff in diffs:
-        if abs(diff) > 1e-10:
-            ok = False
-            print
-            print 'ref', fdct_ref
-            print 'out', fdct_out
-            print 'cmp', diffs
-            print 'FAIL'
-            break
-    if ok:
-        print 'OK'
+        print '%s(%d)...' % (name, n),
+        fdct_ref = ref(n + delay).dot(samples)
+        fdct_out = 1./scale(n) * func(samples)
+        diffs = fdct_ref - fdct_out
+        ok = True
+        for diff in diffs:
+            if abs(diff) > 1e-10:
+                ok = False
+                print
+                print 'ref', fdct_ref
+                print 'out', fdct_out
+                print 'cmp', diffs
+                print 'FAIL'
+                break
+        if ok:
+            print 'OK'
