@@ -144,7 +144,7 @@ def Tt(n, b):
         m10 = (-J(n1-1)).dot(diag(st(n, n1-1)))
         m11 = diag(J(n1-1).dot(ct(n, n1-1)))
         m = quint(m00, m01, m10, m11, 1)
-        op2 = diag(np.array([[1]]), m)
+        op2 = diag(1, m)
         return op1.dot(op2)
     elif b == -1:
         return diag(J(n1), I(n1-1)).dot(Tt(n-1, 1))
