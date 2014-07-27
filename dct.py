@@ -4,13 +4,6 @@ from math import cos, sin, sqrt, pi
 
 np.set_printoptions(precision=3, linewidth=999)
 
-#def dct_II_split_radix_factor(s):
-#    b = [0]
-#    for i in range(s):
-#        b += b
-#        b[-1] ^= 1
-#    return b
-
 # a b
 # c d
 quad = lambda a_b, c_d: np.vstack((np.hstack(a_b),
@@ -169,6 +162,9 @@ s = lambda n, n1: [sin((2*k+1)*pi/(4*n)) for k in range(n1)]
 ct = lambda n, n1m1: [cos(k*pi/(2*n)) for k in range(1, n1m1+1)]
 st = lambda n, n1m1: [sin(k*pi/(2*n)) for k in range(1, n1m1+1)]
 
+#
+# Recursive version
+#
 def rectpl(x, neq2_mat, n_delay,
            twiddle_mat, add_mat, b,
            v1_func, v2_func, hvec_size_add):
@@ -199,6 +195,37 @@ cosIV  = lambda x: rectpl(x, cosIV_neq2_mat,   0, twiddle_m,  add_m,   1, cosII,
 cosI   = lambda x: rectpl(x, cosI_neq2_mat,   -1, twiddle_m2, add_m2,  1, cosI,   cosIII, 1)
 cosIII = lambda x: rectpl(x, cosIII_neq2_mat,  0, twiddle_m2, add_m2,  0, cosI,   sinI,   1)
 sinI   = lambda x: rectpl(x, sinI_neq2_mat,    1, twiddle_m2, add_m2, -1, cosIII, sinI,   0)
+
+#
+# Iterative version
+#
+def dct_II_split_radix_factor(t):
+    '''Bs vector in paper'''
+    b = [0]
+    for i in range(t - 1):
+        b += b
+        b[-1] ^= 1
+    return b
+
+diag_stack = lambda a, b: a if b is None else diag(a, b)
+
+def stack_func(func, t):
+    m = None
+    bits = dct_II_split_radix_factor(t)
+    for s, b in enumerate(bits):
+        ns = 1 << (t - s)
+        m = diag_stack(m, func(ns, b))
+    return m
+
+cosII_func = lambda ns, b: [C_II, C_IV][b](ns)
+permute_func = lambda ns, b: permute_m(ns).T
+
+AnBs = lambda bits, t: stack_func
+
+#def cosII_mat(t):
+#    n = 1<<t
+
+
 
 if __name__ == '__main__':
     t = int(sys.argv[1])
