@@ -1,6 +1,3 @@
 Experiment: trying to implement a generic fast DCT II/III based on "Fast and
 numerically stable algorithms for discrete cosine transforms" from Gerlind
 Plonkaa & Manfred Tasche (DOI: 10.1016/j.laa.2004.07.015).
-
-TODO: implement the non recursive form
-TODO: generate C code for a given size
