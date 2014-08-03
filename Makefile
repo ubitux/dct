@@ -15,12 +15,11 @@ $(eval C_FILE = $(TEST_TOOL).c)
 $(C_FILE): gen_c.py template.c
 	@echo generate $(C_FILE)
 	@$(PYTHON) gen_c.py $(1)
-DCT_SOURCES += $(C_FILE)
-DCT_BINS += $(TEST_TOOL)
 $(TEST_TOOL): $(TEST_TOOL).o
 test-$(TEST_TOOL): $(TEST_TOOL)
 	@echo $$@
 	@./$(TEST_TOOL)
+DCT_BINS += $(TEST_TOOL)
 DCT_TESTS += test-$(TEST_TOOL)
 endef
 $(foreach N,$(DCT_N),$(eval $(call DEFINE_C_DCT_TEST,$(N))))
@@ -43,6 +42,6 @@ $(foreach BITS,$(TFMS_BITS),\
 tests-plonka: $(PLONKA_TESTS)
 
 clean:
-	$(RM) $(DCT_SOURCES)
-distclean: clean
+	$(RM) $(addsuffix .c,$(DCT_BINS))
+	$(RM) $(addsuffix .o,$(DCT_BINS))
 	$(RM) $(DCT_BINS)
