@@ -19,9 +19,9 @@ def next_syms(level, x, symlevel=0):
     n = len(x)
     x0s = str(x[0])
     global call_num
-    prefix = 'x%d_' % call_num
+    prefix = 'x%x_' % call_num
     call_num += 1
-    return sp.Matrix([sp.Symbol('%s%dx' % (prefix, i)) for i in range(n)])
+    return sp.Matrix([sp.Symbol('%s%xx' % (prefix, i)) for i in range(n)])
 
 def rectpl_expr(y, x, neq2_mat, n_delay,
                 modified_matrix, b,
@@ -63,7 +63,7 @@ def get_code(n, fn):
         line = '%s = %s;' % (dst, src)
         if '[' not in dst:
             line = 'const float ' + line
-        if re.match(r'^const float x[0-9]+_[0-9]+x = x[0-9]+_[0-9]+x;$', line):
+        if re.match(r'^const float x[0-9a-f]+_[0-9a-f]+x = x[0-9a-f]+_[0-9a-f]+x;$', line):
             #outcode.append(indent + '//' + line)
             aliases[dst] = aliases.get(src, src)
             continue
@@ -71,7 +71,9 @@ def get_code(n, fn):
             line = line.replace(var, rep)
         line = indent + line
         outcode.append(line)
-    return '\n'.join(outcode)
+    ret = '\n'.join(outcode)
+    # suffixes were added so previous replaces don't break; we don't need them anymore
+    return re.sub(r'(x[0-9a-f]+_[0-9a-f]+)x', r'\1', ret)
 
 def write_dct_code(n):
     outsrc = open('template.c').read() #% tpldata
