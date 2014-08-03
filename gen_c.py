@@ -52,8 +52,8 @@ sinI_expr   = lambda y, x, code, level=1: rectpl_expr(y, x, plonka.sinI_neq2_mat
 def get_code(n, fn):
     global call_num
     call_num = 0
-    x = sp.Matrix([sp.Symbol('src[%*d*stridea]' % (len(str(n)), i)) for i in range(n)])
-    y = sp.Matrix([sp.Symbol('dst[%*d*stridea]' % (len(str(n)), i)) for i in range(n)])
+    x = sp.Matrix([sp.Symbol('src[%*d*src_stridea]' % (len(str(n)), i)) for i in range(n)])
+    y = sp.Matrix([sp.Symbol('dst[%*d*dst_stridea]' % (len(str(n)), i)) for i in range(n)])
     code = []
     fn(y, x, code)
     indent = 8 * ' '
