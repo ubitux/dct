@@ -1,4 +1,4 @@
-import sys, random
+import sys, random, re
 import numpy as np
 import sympy as sp
 from math import cos, sin, sqrt, pi
@@ -13,11 +13,15 @@ def dotx(y, matrix, x, code):
         code.append(ij)
     return y
 
+call_num = 0
+
 def next_syms(level, x, symlevel=0):
     n = len(x)
     x0s = str(x[0])
-    prefix = 'a' if x0s.startswith('src') else chr(ord(x0s[0]) + 1)*level
-    return sp.Matrix([sp.Symbol('%s%d' % (prefix, i)) for i in range(n)])
+    global call_num
+    prefix = 'x%d_' % call_num
+    call_num += 1
+    return sp.Matrix([sp.Symbol('%s%dx' % (prefix, i)) for i in range(n)])
 
 def rectpl_expr(y, x, neq2_mat, n_delay,
                 modified_matrix, b,
@@ -52,15 +56,19 @@ def get_code(n, fn):
     fn(y, x, code)
     indent = 8 * ' '
     outcode = []
-    syms = []
-    for (i, j) in code:
-
-        j = str(j).replace('1.0*','')
-
-        line = '%s = %s;' % (i, j)
-        if '[' not in str(i) and i not in syms:
-            line = 'float ' + line
-            syms.append(i)
+    aliases = {}
+    for (dst, src) in code:
+        dst = str(dst)
+        src = str(src).replace('1.0*','')
+        line = '%s = %s;' % (dst, src)
+        if '[' not in dst:
+            line = 'const float ' + line
+        if re.match(r'^const float x[0-9]+_[0-9]+x = x[0-9]+_[0-9]+x;$', line):
+            #outcode.append(indent + '//' + line)
+            aliases[dst] = aliases.get(src, src)
+            continue
+        for var, rep in aliases.items():
+            line = line.replace(var, rep)
         line = indent + line
         outcode.append(line)
     return '\n'.join(outcode)
