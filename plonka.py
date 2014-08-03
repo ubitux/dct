@@ -4,7 +4,6 @@ from math import cos, sin, sqrt, pi
 
 np.set_printoptions(precision=3, linewidth=999)
 
-# HACK: Overriden by gen_c.py
 sqrt2 = sqrt(2)
 sqrt1_2 = 1./sqrt(2)
 cos_k_pi_n = lambda k, n: cos(k*pi/n)
