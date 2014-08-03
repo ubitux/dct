@@ -6,10 +6,6 @@
 
 #define N %N%
 
-#define COS_1PI8  1.3065629648763766 /* sqrt(2)*cos(  pi/8) */
-#define COS_3PI8  0.5411961001461971 /* sqrt(2)*cos(3*pi/8) */
-#define COS_9PI8 -1.3065629648763768 /* sqrt(2)*cos(9*pi/8) */
-
 static void fdct_1d(float *dst, const float *src,
                     int stridea, int strideb)
 {
