@@ -7,6 +7,8 @@ import plonka
 
 def dotx(y, matrix, x, code):
     calc = sp.Matrix(matrix).dot(x)
+    if not (isinstance(calc, list) or isinstance(calc, sp.Matrix)):
+        calc = [calc]
     for ij in zip(y, calc):
         code.append(ij)
     return y[:len(calc)]
@@ -43,11 +45,11 @@ cosI_expr   = lambda y, x, code, level=1: rectpl_expr(y, x, plonka.cosI_neq2_mat
 cosIII_expr = lambda y, x, code, level=1: rectpl_expr(y, x, plonka.cosIII_neq2_mat,  0, 1,  0, cosI_expr,   sinI_expr,   1, level=level, scale=lambda z:sqrt(z/2), code=code)
 sinI_expr   = lambda y, x, code, level=1: rectpl_expr(y, x, plonka.sinI_neq2_mat,    1, 1, -1, cosIII_expr, sinI_expr,   0, level=level, scale=lambda z:sqrt(z/2), code=code)
 
-def write_dct_code(n):
+def get_code(n, fn):
     x = sp.Matrix([sp.Symbol('src[%*d*stridea]' % (len(str(n)), i)) for i in range(n)])
     y = sp.Matrix([sp.Symbol('dst[%*d*stridea]' % (len(str(n)), i)) for i in range(n)])
     code = []
-    cosII_expr(y, x, code)
+    fn(y, x, code)
     indent = 8 * ' '
     outcode = []
     syms = []
@@ -61,9 +63,13 @@ def write_dct_code(n):
             syms.append(i)
         line = indent + line
         outcode.append(line)
+    return '\n'.join(outcode)
+
+def write_dct_code(n):
     outsrc = open('template.c').read() #% tpldata
     outsrc = outsrc.replace('%N%', str(n))
-    outsrc = outsrc.replace('%CODE%', '\n'.join(outcode))
+    outsrc = outsrc.replace('%CODE_FDCT%', get_code(n, cosII_expr))
+    outsrc = outsrc.replace('%CODE_IDCT%', get_code(n, cosIII_expr))
     open('fdct%d.c' % n, 'w').write(outsrc)
 
 if __name__ == '__main__':

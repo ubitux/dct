@@ -9,7 +9,7 @@ all: tests-plonka tests-fdct
 #
 fdct%: fdct%.o
 
-FDCT_N = 2 3 4
+FDCT_N = 2 3 4 5
 define DEFINE_C_FDCT_TEST
 $(eval DIM = $(shell echo $$((1 << $(1)))))
 fdct$(DIM).c: gen_c.py template.c
