@@ -45,3 +45,5 @@ clean:
 	$(RM) $(addsuffix .c,$(DCT_BINS))
 	$(RM) $(addsuffix .o,$(DCT_BINS))
 	$(RM) $(DCT_BINS)
+
+.PHONY: tests tests-plonka tests-dct $(PLONKA_TESTS) $(DCT_TESTS) clean
