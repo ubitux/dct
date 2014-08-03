@@ -12,15 +12,17 @@ dct-%: dct-%.o
 DCT_N = 2 3 4 5
 define DEFINE_C_DCT_TEST
 $(eval DIM = $(shell echo $$((1 << $(1)))))
-dct$(DIM).c: gen_c.py template.c
-	@echo generate dct$(DIM).c
+$(eval TEST_TOOL = dct$(DIM))
+$(eval C_FILE = $(TEST_TOOL).c)
+$(C_FILE): gen_c.py template.c
+	@echo generate $(C_FILE)
 	@$(PYTHON) gen_c.py $(1)
-DCT_SOURCES += dct$(DIM).c
-DCT_BINS += dct$(DIM)
-test-dct-$(DIM): dct$(DIM)
-	@echo test-dct-$(DIM)
-	@./dct$(DIM)
-DCT_TESTS += test-dct-$(DIM)
+DCT_SOURCES += $(C_FILE)
+DCT_BINS += $(TEST_TOOL)
+test-$(TEST_TOOL): $(TEST_TOOL)
+	@echo $$@
+	@./$(TEST_TOOL)
+DCT_TESTS += test-$(TEST_TOOL)
 endef
 $(foreach N,$(DCT_N),$(eval $(call DEFINE_C_DCT_TEST,$(N))))
 tests-dct: $(DCT_TESTS)
