@@ -11,7 +11,7 @@ def dotx(y, matrix, x, code):
         calc = [calc]
     for ij in zip(y, calc):
         code.append(ij)
-    return y[:len(calc)]
+    return y
 
 def next_syms(level, x, symlevel=0):
     n = len(x)
