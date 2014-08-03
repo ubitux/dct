@@ -70,7 +70,7 @@ def write_dct_code(n):
     outsrc = outsrc.replace('%N%', str(n))
     outsrc = outsrc.replace('%CODE_FDCT%', get_code(n, cosII_expr))
     outsrc = outsrc.replace('%CODE_IDCT%', get_code(n, cosIII_expr))
-    open('fdct%d.c' % n, 'w').write(outsrc)
+    open('dct%d.c' % n, 'w').write(outsrc)
 
 if __name__ == '__main__':
     if len(sys.argv) != 2:

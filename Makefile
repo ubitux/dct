@@ -2,27 +2,28 @@ LDLIBS += -lm
 CFLAGS += -Wall -Wextra -O3
 PYTHON := python2
 
-all: tests-plonka tests-fdct
+all: tests-plonka tests-dct
 
 #
-# generate test-fdct-{4,8,16,...} rules
+# generate test-dct-{4,8,16,...} rules
 #
-fdct%: fdct%.o
+dct-%: dct-%.o
 
-FDCT_N = 2 3 4 5
-define DEFINE_C_FDCT_TEST
+DCT_N = 2 3 4 5
+define DEFINE_C_DCT_TEST
 $(eval DIM = $(shell echo $$((1 << $(1)))))
-fdct$(DIM).c: gen_c.py template.c
-	@echo generate fdct$(DIM).c
+dct$(DIM).c: gen_c.py template.c
+	@echo generate dct$(DIM).c
 	@$(PYTHON) gen_c.py $(1)
-FDCT_SOURCES += fdct$(DIM).c
-test-fdct-$(DIM): fdct$(DIM)
-	@echo test-fdct-$(DIM)
-	@./fdct$(DIM)
-FDCT_TESTS += test-fdct-$(DIM)
+DCT_SOURCES += dct$(DIM).c
+DCT_BINS += dct$(DIM)
+test-dct-$(DIM): dct$(DIM)
+	@echo test-dct-$(DIM)
+	@./dct$(DIM)
+DCT_TESTS += test-dct-$(DIM)
 endef
-$(foreach N,$(FDCT_N),$(eval $(call DEFINE_C_FDCT_TEST,$(N))))
-tests-fdct: $(FDCT_TESTS)
+$(foreach N,$(DCT_N),$(eval $(call DEFINE_C_DCT_TEST,$(N))))
+tests-dct: $(DCT_TESTS)
 
 #
 # generate test-plonka-{cosI,cosII,...}-{2,4,8,...} rules
@@ -41,6 +42,6 @@ $(foreach BITS,$(TFMS_BITS),\
 tests-plonka: $(PLONKA_TESTS)
 
 clean:
-	$(RM) $(FDCT_SOURCES)
+	$(RM) $(DCT_SOURCES)
 distclean: clean
-	$(RM) $(FDCT_TESTS)
+	$(RM) $(DCT_BINS)
