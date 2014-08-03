@@ -2,7 +2,7 @@ LDLIBS += -lm
 CFLAGS += -Wall -Wextra -O3
 PYTHON := python2
 
-all: tests-plonka tests-dct
+tests: tests-plonka tests-dct
 
 #
 # generate test-dct-{4,8,16,...} rules
