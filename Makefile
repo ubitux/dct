@@ -7,8 +7,6 @@ tests: tests-plonka tests-dct
 #
 # generate test-dct-{4,8,16,...} rules
 #
-dct-%: dct-%.o
-
 DCT_N = 2 3 4 5
 define DEFINE_C_DCT_TEST
 $(eval DIM = $(shell echo $$((1 << $(1)))))
@@ -19,6 +17,7 @@ $(C_FILE): gen_c.py template.c
 	@$(PYTHON) gen_c.py $(1)
 DCT_SOURCES += $(C_FILE)
 DCT_BINS += $(TEST_TOOL)
+$(TEST_TOOL): $(TEST_TOOL).o
 test-$(TEST_TOOL): $(TEST_TOOL)
 	@echo $$@
 	@./$(TEST_TOOL)
