@@ -23,22 +23,23 @@ def next_syms(x):
     call_num += 1
     return sp.Matrix([sp.Symbol('%s%xx' % (prefix, i)) for i in range(n)])
 
-def tfm_run(name, y, x, code, first_call=True):
+def tfm_run(name, y, x, code, scale_factor=None):
     neq2_mat, n_delay, b, v1_tfm, v2_tfm, hvec_size_add, modified_matrix = plonka.tfm_props[name]
     n_orig = len(x)
     n = n_orig + n_delay
     n1 = n / 2
+    if scale_factor is None:
+        scale_factor = 1./sqrt(n>>modified_matrix)
     if n == 2:
-        return dotx(y, neq2_mat, x, code)
+        return dotx(y, scale_factor * neq2_mat, x, code)
     elif n >= 4:
         u = dotx(next_syms(x), plonka.sqrt2 * plonka.twiddle_m(n, b, modified_matrix), x, code)
         vsyms = next_syms(u)
-        v1 = tfm_run(v1_tfm, vsyms[:n1+hvec_size_add], u[:n1+hvec_size_add], code, False)
-        v2 = tfm_run(v2_tfm, vsyms[n1+hvec_size_add:], u[n1+hvec_size_add:], code, False)
+        v1 = tfm_run(v1_tfm, vsyms[:n1+hvec_size_add], u[:n1+hvec_size_add], code, scale_factor)
+        v2 = tfm_run(v2_tfm, vsyms[n1+hvec_size_add:], u[n1+hvec_size_add:], code, scale_factor)
         v = np.hstack((v1, v2))
         w = plonka.add_m(n, b, modified_matrix).dot(v)
-        scale_factor = 1./sqrt(n>>modified_matrix) if first_call else 1
-        return dotx(y, scale_factor * plonka.permute_m(n_orig).T, w, code)
+        return dotx(y, plonka.permute_m(n_orig).T, w, code)
     assert False
 
 def get_code(n, fn):
