@@ -54,8 +54,11 @@ def get_code(n, fn):
     aliases = {}
     for (dst, src) in code:
         dst = str(dst)
+
+        # yeah well...
         src = str(src).replace('1.0*','')
 
+        # a*x + a*y → a * (x + y)
         s = src.split()
         if len(s) == 3 and s[1] in ('-', '+'):
             a = s[0].split('*')
@@ -71,12 +74,17 @@ def get_code(n, fn):
         line = '%s = %s;' % (dst, src)
         if '[' not in dst:
             line = 'const float ' + line
+
+        # drop no-op lines such as "const float a = b;" with aliases
         if re.match(r'^const float x[0-9a-f]+_[0-9a-f]+x = x[0-9a-f]+_[0-9a-f]+x;$', line):
             #outcode.append(indent + '//' + line)
             aliases[dst] = aliases.get(src, src)
             continue
+
+        # apply any aliases
         for var, rep in aliases.items():
             line = line.replace(var, rep)
+
         line = indent + line
         outcode.append(line)
     ret = '\n'.join(outcode)
