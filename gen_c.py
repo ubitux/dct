@@ -58,7 +58,7 @@ def get_code(n, fn):
         # yeah well...
         src = str(src).replace('1.0*','')
 
-        # a*x + a*y → a * (x + y)
+        # a*x + a*y -> a * (x + y)
         s = src.split()
         if len(s) == 3 and s[1] in ('-', '+'):
             a = s[0].split('*')
