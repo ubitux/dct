@@ -54,6 +54,19 @@ def get_code(n, fn):
     for (dst, src) in code:
         dst = str(dst)
         src = str(src).replace('1.0*','')
+
+        s = src.split()
+        if len(s) == 3 and s[1] in ('-', '+'):
+            a = s[0].split('*')
+            b = s[2].split('*')
+            if len(a) == 2 and len(b) == 2:
+                cst1, xval1 = a
+                cst2, xval2 = b
+                if cst1.startswith('x'): xval1, cst1 = a
+                if cst2.startswith('x'): xval2, cst2 = b
+                if cst1 == cst2:
+                    src = '%s * (%s %s %s)' % (cst1, xval1, s[1], xval2)
+
         line = '%s = %s;' % (dst, src)
         if '[' not in dst:
             line = 'const float ' + line
