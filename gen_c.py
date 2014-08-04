@@ -15,7 +15,7 @@ def dotx(y, matrix, x, code):
 
 call_num = 0
 
-def next_syms(level, x, symlevel=0):
+def next_syms(x):
     n = len(x)
     x0s = str(x[0])
     global call_num
@@ -23,31 +23,23 @@ def next_syms(level, x, symlevel=0):
     call_num += 1
     return sp.Matrix([sp.Symbol('%s%xx' % (prefix, i)) for i in range(n)])
 
-def rectpl_expr(y, x, neq2_mat, n_delay,
-                modified_matrix, b,
-                v1_func, v2_func, hvec_size_add,
-                level, scale, code):
+def tfm_run(name, y, x, code, first_call=True):
+    neq2_mat, n_delay, b, v1_tfm, v2_tfm, hvec_size_add, modified_matrix = plonka.tfm_props[name]
     n_orig = len(x)
     n = n_orig + n_delay
     n1 = n / 2
     if n == 2:
         return dotx(y, neq2_mat, x, code)
-    if n >= 4:
-        u = dotx(next_syms(level, x), plonka.sqrt2 * plonka.twiddle_m(n, b, modified_matrix), x, code)
-        vsyms = next_syms(level, u)
-        v1 = v1_func(vsyms[:n1+hvec_size_add], u[:n1+hvec_size_add], level=level + 1, code=code)
-        v2 = v2_func(vsyms[n1+hvec_size_add:], u[n1+hvec_size_add:], level=level + 1, code=code)
+    elif n >= 4:
+        u = dotx(next_syms(x), plonka.sqrt2 * plonka.twiddle_m(n, b, modified_matrix), x, code)
+        vsyms = next_syms(u)
+        v1 = tfm_run(v1_tfm, vsyms[:n1+hvec_size_add], u[:n1+hvec_size_add], code, False)
+        v2 = tfm_run(v2_tfm, vsyms[n1+hvec_size_add:], u[n1+hvec_size_add:], code, False)
         v = np.hstack((v1, v2))
         w = plonka.add_m(n, b, modified_matrix).dot(v)
-        scale_factor = 1./scale(n) if level == 1 else 1
+        scale_factor = 1./sqrt(n>>modified_matrix) if first_call else 1
         return dotx(y, scale_factor * plonka.permute_m(n_orig).T, w, code)
     assert False
-
-cosII_expr  = lambda y, x, code, level=1: rectpl_expr(y, x, plonka.cosII_neq2_mat,   0, 0,  0, cosII_expr,  cosIV_expr,  0, level=level, scale=lambda z:sqrt(z), code=code)
-cosIV_expr  = lambda y, x, code, level=1: rectpl_expr(y, x, plonka.cosIV_neq2_mat,   0, 0,  1, cosII_expr,  cosII_expr,  0, level=level, scale=lambda z:sqrt(z), code=code)
-cosI_expr   = lambda y, x, code, level=1: rectpl_expr(y, x, plonka.cosI_neq2_mat,   -1, 1,  1, cosI_expr,   cosIII_expr, 1, level=level, scale=lambda z:sqrt(z/2), code=code)
-cosIII_expr = lambda y, x, code, level=1: rectpl_expr(y, x, plonka.cosIII_neq2_mat,  0, 1,  0, cosI_expr,   sinI_expr,   1, level=level, scale=lambda z:sqrt(z/2), code=code)
-sinI_expr   = lambda y, x, code, level=1: rectpl_expr(y, x, plonka.sinI_neq2_mat,    1, 1, -1, cosIII_expr, sinI_expr,   0, level=level, scale=lambda z:sqrt(z/2), code=code)
 
 def get_code(n, fn):
     global call_num
@@ -55,7 +47,7 @@ def get_code(n, fn):
     x = sp.Matrix([sp.Symbol('src[%*d*src_stridea]' % (len(str(n)), i)) for i in range(n)])
     y = sp.Matrix([sp.Symbol('dst[%*d*dst_stridea]' % (len(str(n)), i)) for i in range(n)])
     code = []
-    fn(y, x, code)
+    tfm_run(fn, y, x, code)
     indent = 8 * ' '
     outcode = []
     aliases = {}
@@ -80,8 +72,8 @@ def get_code(n, fn):
 def write_dct_code(n):
     outsrc = open('template.c').read() #% tpldata
     outsrc = outsrc.replace('%N%', str(n))
-    outsrc = outsrc.replace('%CODE_FDCT%', get_code(n, cosII_expr))
-    outsrc = outsrc.replace('%CODE_IDCT%', get_code(n, cosIII_expr))
+    outsrc = outsrc.replace('%CODE_FDCT%', get_code(n, 'cosII'))
+    outsrc = outsrc.replace('%CODE_IDCT%', get_code(n, 'cosIII'))
     open('dct%d.c' % n, 'w').write(outsrc)
 
 if __name__ == '__main__':

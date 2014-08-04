@@ -176,16 +176,15 @@ cosIII_neq2_mat = sqrt1_2 * np.array([[1,  1],
                                       [1, -1]])
 sinI_neq2_mat = I(1)
 
+tfm_props = {
+    'cosII':  (cosII_neq2_mat,   0,  0, 'cosII',  'cosIV',  0, 0),
+    'cosIV':  (cosIV_neq2_mat,   0,  1, 'cosII',  'cosII',  0, 0),
+    'cosI':   (cosI_neq2_mat,   -1,  1, 'cosI',   'cosIII', 1, 1),
+    'cosIII': (cosIII_neq2_mat,  0,  0, 'cosI',   'sinI',   1, 1),
+    'sinI':   (sinI_neq2_mat,    1, -1, 'cosIII', 'sinI',   0, 1),
+}
+
 def tfm_run(name, x, first_call=True):
-
-    tfm_props = {
-        'cosII':  (cosII_neq2_mat,   0,  0, 'cosII',  'cosIV',  0, 0),
-        'cosIV':  (cosIV_neq2_mat,   0,  1, 'cosII',  'cosII',  0, 0),
-        'cosI':   (cosI_neq2_mat,   -1,  1, 'cosI',   'cosIII', 1, 1),
-        'cosIII': (cosIII_neq2_mat,  0,  0, 'cosI',   'sinI',   1, 1),
-        'sinI':   (sinI_neq2_mat,    1, -1, 'cosIII', 'sinI',   0, 1),
-    }
-
     neq2_mat, n_delay, b, v1_tfm, v2_tfm, hvec_size_add, modified_matrix = tfm_props[name]
     n_orig = len(x)
     n = n_orig + n_delay
