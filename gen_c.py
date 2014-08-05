@@ -1,7 +1,7 @@
-import sys, random, re
+import sys, re
 import numpy as np
 import sympy as sp
-from math import cos, sin, sqrt, pi
+from math import sqrt
 
 import plonka
 
