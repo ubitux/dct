@@ -2,6 +2,7 @@ import sys, re
 import numpy as np
 import sympy as sp
 from math import sqrt
+from collections import Counter
 
 import plonka
 
@@ -87,6 +88,34 @@ def get_code(n, fn):
 
         line = indent + line
         outcode.append(line)
+    ret = '\n'.join(outcode)
+
+    # look for simple indirections (one assignement, one use)
+    var_histogram = Counter(re.findall(r'x[0-9a-f]+_[0-9a-f]+x', ret))
+    simple_vars = [key for key, val in var_histogram.items() if val == 2]
+
+    # when the use of this variable is as simple as a = b, replace with the
+    # original value
+    for var in simple_vars:
+        outcode2 = []
+        for line in outcode:
+            if ' = %s;' % var in line:
+                for line2 in outcode:
+                    if var in line2:
+                        data = line2.split('=')[1]
+                        break
+                dst, src = line.split('=')
+                line = dst + '=' + data
+            outcode2.append(line)
+        outcode = outcode2
+    ret = '\n'.join(outcode)
+
+    # now that the indirection is removed, remove the original assignment which
+    # is now unused
+    var_histogram = Counter(re.findall(r'x[0-9a-f]+_[0-9a-f]+x', ret))
+    orphan_vars = [key for key, val in var_histogram.items() if val == 1]
+    for orphan in orphan_vars:
+        outcode = [line for line in outcode if orphan not in line]
     ret = '\n'.join(outcode)
 
     # symbol indexing and renaming

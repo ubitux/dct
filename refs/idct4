@@ -2,11 +2,9 @@
         const float x1 = 1.30656296487638*src[1*src_stridea] + 0.541196100146197*src[3*src_stridea];
         const float x2 = 1.4142135623731*src[2*src_stridea];
         const float x3 = -0.541196100146197*src[1*src_stridea] + 1.30656296487638*src[3*src_stridea];
-        const float x4 = 0.353553390593274*x0 + 0.5*x1 + 0.353553390593274*x2;
-        const float x5 = 0.5 * (x0 - x2);
-        const float x6 = 0.353553390593274*x0 - 0.5*x1 + 0.353553390593274*x2;
-        const float x7 = 0.707106781186547*x3;
-        dst[0*dst_stridea] = x4;
-        dst[1*dst_stridea] = 0.707106781186547 * (x5 - x7);
-        dst[2*dst_stridea] = 0.707106781186547 * (x5 + x7);
-        dst[3*dst_stridea] = x6;
+        const float x4 = 0.5 * (x0 - x2);
+        const float x5 = 0.707106781186547*x3;
+        dst[0*dst_stridea] = 0.353553390593274*x0 + 0.5*x1 + 0.353553390593274*x2;
+        dst[1*dst_stridea] = 0.707106781186547 * (x4 - x5);
+        dst[2*dst_stridea] = 0.707106781186547 * (x4 + x5);
+        dst[3*dst_stridea] = 0.353553390593274*x0 - 0.5*x1 + 0.353553390593274*x2;

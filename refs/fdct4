@@ -2,11 +2,7 @@
         const float x1 = src[1*src_stridea] + src[2*src_stridea];
         const float x2 = src[0*src_stridea] - src[3*src_stridea];
         const float x3 = src[1*src_stridea] - src[2*src_stridea];
-        const float x4 = 0.5 * (x0 + x1);
-        const float x5 = 0.5 * (x0 - x1);
-        const float x6 = 0.653281482438188*x2 + 0.270598050073099*x3;
-        const float x7 = 0.270598050073099*x2 - 0.653281482438188*x3;
-        dst[0*dst_stridea] = x4;
-        dst[1*dst_stridea] = x6;
-        dst[2*dst_stridea] = x5;
-        dst[3*dst_stridea] = x7;
+        dst[0*dst_stridea] = 0.5 * (x0 + x1);
+        dst[1*dst_stridea] = 0.653281482438188*x2 + 0.270598050073099*x3;
+        dst[2*dst_stridea] = 0.5 * (x0 - x1);
+        dst[3*dst_stridea] = 0.270598050073099*x2 - 0.653281482438188*x3;
