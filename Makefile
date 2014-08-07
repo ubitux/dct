@@ -7,7 +7,7 @@ tests: tests-plonka tests-dct
 #
 # generate test-dct-{4,8,16,...} rules
 #
-DCT_N = 2 3 4 5
+DCT_N = 1 2 3 4 5 6
 define DEFINE_C_DCT_TEST
 $(eval DIM = $(shell echo $$((1 << $(1)))))
 $(eval TEST_TOOL = dct$(DIM))
@@ -29,7 +29,7 @@ tests-dct: $(DCT_TESTS)
 # generate test-plonka-{cosI,cosII,...}-{2,4,8,...} rules
 #
 TFMS = cosI cosII cosIII cosIV sinI
-TFMS_BITS = 1 2 3 4 5 6 7 8
+TFMS_BITS = 1 2 3 4 5 6 7 8 9
 define DEFINE_PLONKA_TEST
 test-plonka-$(1)-$(2):
 	@echo test-plonka-$(1)-$(shell echo $$((1 << $(2))))
