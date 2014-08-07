@@ -88,8 +88,15 @@ def get_code(n, fn):
         line = indent + line
         outcode.append(line)
     ret = '\n'.join(outcode)
-    # suffixes were added so previous replaces don't break; we don't need them anymore
-    return re.sub(r'(x[0-9a-f]+_[0-9a-f]+)x', r'\1', ret)
+
+    # symbol indexing and renaming
+    varsfrom = sorted(set(re.findall(r'x[0-9a-f]+_[0-9a-f]+x', ret)))
+    nb_var = len(varsfrom)
+    varsto = ['x%0*x' % (len('%x' % nb_var), x) for x in range(nb_var)]
+    for var_from, var_to in zip(varsfrom, varsto):
+        ret = ret.replace(var_from, var_to)
+
+    return ret
 
 def write_dct_code(n):
     outsrc = open('template.c').read() #% tpldata
