@@ -101,9 +101,13 @@ def get_code(n, fn):
 def write_dct_code(n):
     outsrc = open('template.c').read() #% tpldata
     outsrc = outsrc.replace('%N%', str(n))
-    outsrc = outsrc.replace('%CODE_FDCT%', get_code(n, 'cosII'))
-    outsrc = outsrc.replace('%CODE_IDCT%', get_code(n, 'cosIII'))
+    fdct = get_code(n, 'cosII')
+    idct = get_code(n, 'cosIII')
+    outsrc = outsrc.replace('%CODE_FDCT%', fdct)
+    outsrc = outsrc.replace('%CODE_IDCT%', idct)
     open('dct%d.c' % n, 'w').write(outsrc)
+    open('refs/fdct%d' % n, 'w').write(fdct)
+    open('refs/idct%d' % n, 'w').write(idct)
 
 if __name__ == '__main__':
     if len(sys.argv) != 2:
