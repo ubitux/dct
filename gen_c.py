@@ -60,6 +60,7 @@ def get_code(n, fn):
         src = str(src).replace('1.0*','')
 
         # a*x + a*y -> a * (x + y)
+        # XXX: sympy sucks at refactoring
         s = src.split()
         if len(s) == 3 and s[1] in ('-', '+'):
             a = s[0].split('*')
@@ -71,6 +72,14 @@ def get_code(n, fn):
                 if cst2.startswith('x'): xval2, cst2 = b
                 if cst1 == cst2:
                     src = '%s * (%s %s %s)' % (cst1, xval1, s[1], xval2)
+
+        # a*x + <whatever> + a*y -> a*(x + y) + <whatever>
+        # XXX: again sympy sucks... anyone willing to suggest a better solution?
+        m = re.match(r'([0-9.-]+)\*(x[0-9a-f]+_[0-9a-f]+x) ([+-] [^+-]*) ([+-]) ([0-9.-]+)\*(x[0-9a-f]+_[0-9a-f]+x)', src)
+        if m:
+            cst1, var1, middle_expr, sign, cst2, var2 = m.groups()
+            if cst1 == cst2:
+                src = '%s * (%s %s %s) %s' % (cst1 , var1, sign, var2, middle_expr)
 
         line = '%s = %s;' % (dst, src)
         if '[' not in dst:

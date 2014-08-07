@@ -35,9 +35,9 @@
         const float x26 = 1.30656296487638*x18 + 0.541196100146197*x1a;
         const float x27 = 1.4142135623731*x19;
         const float x28 = -0.541196100146197*x18 + 1.30656296487638*x1a;
-        const float x29 = 0.176776695296637*x25 + 0.25*x26 + 0.176776695296637*x27;
+        const float x29 = 0.176776695296637 * (x25 + x27) + 0.25*x26;
         const float x2a = 0.25 * (x25 - x27);
-        const float x2b = 0.176776695296637*x25 - 0.25*x26 + 0.176776695296637*x27;
+        const float x2b = 0.176776695296637 * (x25 + x27) - 0.25*x26;
         const float x2c = 0.353553390593274*x28;
         const float x1b = 0.707106781186547 * (x2a - x2c);
         const float x1c = 0.707106781186547 * (x2a + x2c);
@@ -52,9 +52,9 @@
         const float x38 = 1.30656296487638*x2e + 0.541196100146197*x30;
         const float x39 = 1.4142135623731*x2f;
         const float x3a = -0.541196100146197*x2e + 1.30656296487638*x30;
-        const float x3b = 0.176776695296637*x37 + 0.25*x38 + 0.176776695296637*x39;
+        const float x3b = 0.176776695296637 * (x37 + x39) + 0.25*x38;
         const float x3c = 0.25 * (x37 - x39);
-        const float x3d = 0.176776695296637*x37 - 0.25*x38 + 0.176776695296637*x39;
+        const float x3d = 0.176776695296637 * (x37 + x39) - 0.25*x38;
         const float x3e = 0.353553390593274*x3a;
         const float x34 = 0.707106781186547 * (x3c - x3e);
         const float x35 = 0.707106781186547 * (x3c + x3e);
@@ -67,7 +67,7 @@
         const float x36 = -x43;
         const float x10 = -x34;
         const float x11 = -x3d;
-        dst[ 0*dst_stridea] = 0.176776695296637*x1d + 0.25*x1e + 0.176776695296637*x1f;
+        dst[ 0*dst_stridea] = 0.176776695296637 * (x1d + x1f) + 0.25*x1e;
         dst[ 1*dst_stridea] = 0.707106781186547 * (x29 - x11);
         dst[ 2*dst_stridea] = 0.707106781186547 * (x29 + x11);
         dst[ 3*dst_stridea] = 0.707106781186547 * (x23 + x36);
@@ -82,4 +82,4 @@
         dst[12*dst_stridea] = 0.707106781186547 * (x24 - x42);
         dst[13*dst_stridea] = 0.707106781186547 * (x2b - x3b);
         dst[14*dst_stridea] = 0.707106781186547 * (x2b + x3b);
-        dst[15*dst_stridea] = 0.176776695296637*x1d - 0.25*x1e + 0.176776695296637*x1f;
+        dst[15*dst_stridea] = 0.176776695296637 * (x1d + x1f) - 0.25*x1e;

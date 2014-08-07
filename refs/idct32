@@ -68,9 +68,9 @@
         const float x97 = 1.30656296487638*x89 + 0.541196100146197*x8b;
         const float x98 = 1.4142135623731*x8a;
         const float x99 = -0.541196100146197*x89 + 1.30656296487638*x8b;
-        const float x9a = 0.125*x96 + 0.176776695296637*x97 + 0.125*x98;
+        const float x9a = 0.125 * (x96 + x98) + 0.176776695296637*x97;
         const float x9b = 0.176776695296637 * (x96 - x98);
-        const float x9c = 0.125*x96 - 0.176776695296637*x97 + 0.125*x98;
+        const float x9c = 0.125 * (x96 + x98) - 0.176776695296637*x97;
         const float x9d = 0.25*x99;
         const float x8c = 0.707106781186547 * (x9b - x9d);
         const float x8d = 0.707106781186547 * (x9b + x9d);
@@ -87,9 +87,9 @@
         const float xa9 = 1.4142135623731*xa0;
         const float xaa = x9e - xa2;
         const float xab = x9f - xa1;
-        const float xac = 0.125*xa7 + 0.176776695296637*xa8 + 0.125*xa9;
+        const float xac = 0.125 * (xa7 + xa9) + 0.176776695296637*xa8;
         const float xad = 0.176776695296637 * (xa7 - xa9);
-        const float xae = 0.125*xa7 - 0.176776695296637*xa8 + 0.125*xa9;
+        const float xae = 0.125 * (xa7 + xa9) - 0.176776695296637*xa8;
         const float xaf = 0.176776695296637 * (xaa + xab);
         const float xb0 = 0.176776695296637 * (xaa - xab);
         const float xb1 = 1.4142135623731*xa4;
@@ -133,9 +133,9 @@
         const float x42 = 1.4142135623731*x39;
         const float x43 = x37 - x3b;
         const float x44 = x38 - x3a;
-        const float x45 = 0.125*x40 + 0.176776695296637*x41 + 0.125*x42;
+        const float x45 = 0.125 * (x40 + x42) + 0.176776695296637*x41;
         const float x46 = 0.176776695296637 * (x40 - x42);
-        const float x47 = 0.125*x40 - 0.176776695296637*x41 + 0.125*x42;
+        const float x47 = 0.125 * (x40 + x42) - 0.176776695296637*x41;
         const float x48 = 0.176776695296637 * (x43 + x44);
         const float x49 = 0.176776695296637 * (x43 - x44);
         const float x4a = 1.4142135623731*x3d;
@@ -162,9 +162,9 @@
         const float x5f = 1.30656296487638*x51 + 0.541196100146197*x53;
         const float x60 = 1.4142135623731*x52;
         const float x61 = -0.541196100146197*x51 + 1.30656296487638*x53;
-        const float x62 = 0.125*x5e + 0.176776695296637*x5f + 0.125*x60;
+        const float x62 = 0.125 * (x5e + x60) + 0.176776695296637*x5f;
         const float x63 = 0.176776695296637 * (x5e - x60);
-        const float x64 = 0.125*x5e - 0.176776695296637*x5f + 0.125*x60;
+        const float x64 = 0.125 * (x5e + x60) - 0.176776695296637*x5f;
         const float x65 = 0.25*x61;
         const float x57 = 0.707106781186547 * (x63 - x65);
         const float x58 = 0.707106781186547 * (x63 + x65);
@@ -181,7 +181,7 @@
         const float x5b = -x31;
         const float x5c = -x33;
         const float x5d = -x47;
-        dst[ 0*dst_stridea] = 0.125*x8e + 0.176776695296637*x8f + 0.125*x90;
+        dst[ 0*dst_stridea] = 0.125 * (x8e + x90) + 0.176776695296637*x8f;
         dst[ 1*dst_stridea] = -0.707106781186547*x5d + 0.707106781186547*xac;
         dst[ 2*dst_stridea] = 0.707106781186547 * (x5d + xac);
         dst[ 3*dst_stridea] = 0.707106781186547 * (x36 + x9a);
@@ -212,4 +212,4 @@
         dst[28*dst_stridea] = -0.707106781186547*x62 + 0.707106781186547*x9c;
         dst[29*dst_stridea] = -0.707106781186547*x45 + 0.707106781186547*xae;
         dst[30*dst_stridea] = 0.707106781186547 * (x45 + xae);
-        dst[31*dst_stridea] = 0.125*x8e - 0.176776695296637*x8f + 0.125*x90;
+        dst[31*dst_stridea] = 0.125 * (x8e + x90) - 0.176776695296637*x8f;

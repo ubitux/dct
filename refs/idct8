@@ -21,11 +21,11 @@
         const float x15 = 0.353553390593274 * (x11 - x12);
         const float x16 = 0.5*x13;
         const float x08 = -x15;
-        dst[0*dst_stridea] = 0.25*x09 + 0.353553390593274*x0a + 0.25*x0b;
+        dst[0*dst_stridea] = 0.25 * (x09 + x0b) + 0.353553390593274*x0a;
         dst[1*dst_stridea] = 0.707106781186547 * (x0f - x08);
         dst[2*dst_stridea] = 0.707106781186547 * (x0f + x08);
         dst[3*dst_stridea] = 0.707106781186547 * (x0e + x16);
         dst[4*dst_stridea] = 0.707106781186547 * (x0e - x16);
         dst[5*dst_stridea] = 0.707106781186547 * (x10 - x14);
         dst[6*dst_stridea] = 0.707106781186547 * (x10 + x14);
-        dst[7*dst_stridea] = 0.25*x09 - 0.353553390593274*x0a + 0.25*x0b;
+        dst[7*dst_stridea] = 0.25 * (x09 + x0b) - 0.353553390593274*x0a;
